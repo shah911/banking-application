@@ -16,6 +16,8 @@ jobs:
           POSTGRES_USER: root
           POSTGRES_PASSWORD: secret
           POSTGRES_DB: simple_bank
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -29,15 +31,11 @@ jobs:
         with:
           go-version: "1.23"
 
-      - name: Install unzip
-        run: sudo apt-get update && sudo apt-get install -y unzip
-
       - name: Install golang-migrate
         run: |
-          curl -L -o migrate.zip https://github.com/golang-migrate/migrate/releases/download/v4.18.1/migrate-4.18.1.zip
-          unzip migrate.zip
-          sudo mv migrate.linux-amd64 /usr/bin/migrate
-          which migrate
+          curl -s https://packagecloud.io/install/repositories/golang-migrate/migrate/script.deb.sh | sudo bash
+          sudo apt-get update
+          sudo apt-get install -y migrate
 
       - name: Run migration
         run: make migrateup
